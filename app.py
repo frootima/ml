@@ -1,23 +1,26 @@
 from flask import Flask, request, jsonify
-import joblib
 import numpy as np
+import pickle
 
 app = Flask(__name__)
 
 # Load the trained model
-model = joblib.load('/home/visam/logistic_model.pkl')
+with open("logistic_model.pkl", "rb") as model_file:
+    model = pickle.load(model_file)
 
-@app.route('/predict', methods=['POST'])
+@app.route("/predict", methods=["POST"])
 def predict():
-    data = request.json  # Input should be a JSON payload
-    features = np.array(data['features']).reshape(1, -1)
-    prediction = model.predict(features)
-    probability = model.predict_proba(features)
-    return jsonify({
-        'prediction': int(prediction[0]),
-        'probability': probability.tolist()
-    })
+    # Parse input data
+    data = request.json
+    features = np.array(data["features"])
+    # Reshape for prediction if single sample
+    if len(features.shape) == 1:
+        features = features.reshape(1, -1)
+    # Predict
+    prediction = model.predict(features).tolist()
+    probability = model.predict_proba(features).tolist()
+    return jsonify({"prediction": prediction, "probability": probability})
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True)
 
