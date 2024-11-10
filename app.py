@@ -5,7 +5,7 @@ import numpy as np
 app = Flask(__name__)
 
 # Load the trained model
-model = joblib.load('/home/visam/logistic_model.pkl')
+model = joblib.load('logistic_model.pkl')
 
 @app.route('/predict', methods=['POST'])
 def predict():
